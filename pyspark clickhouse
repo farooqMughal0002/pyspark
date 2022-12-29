@@ -1,0 +1,16 @@
+import findspark
+findspark.init()
+from pyspark import SparkContext, SparkConf, SQLContext
+if __name__ == '__main__':
+        from pyspark.sql import SparkSession
+        appName="Connect To clickhouse - via JDBC"
+        spark = SparkSession.builder.master('local').appName(appName).config("spark.driver.extraClassPath","./clickhouse-native-jdbc-shaded-2.5.4.jar").getOrCreate()
+
+        url="jdbc:clickhouse://127.0.0.1:9000"
+        user="default" #replace by whatever you use
+        password="" #same here
+        dbtable='nameOfDatabase.nameOfTable'
+        driver="com.github.housepower.jdbc.ClickHouseDriver"
+
+        pgDF=spark.read.format('jdbc').option('driver',driver).option('url',url).option('user',user).option('password',password).option('dbtable',dbtable).load()
+        print(pgDF.show())
